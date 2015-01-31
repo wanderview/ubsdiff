@@ -30,7 +30,6 @@ __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bsdiff/bsdiff.c,v 1.1 2005/08/06 01:59:05
 
 #include <sys/types.h>
 
-#include <bzlib.h>
 #include <err.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -210,8 +209,6 @@ int main(int argc,char *argv[])
 	u_char buf[8];
 	u_char header[32];
 	FILE * pf;
-	BZFILE * pfbz2;
-	int bz2err;
 
 	if(argc!=4) errx(1,"usage: %s oldfile newfile patchfile\n",argv[0]);
 
@@ -267,8 +264,6 @@ int main(int argc,char *argv[])
 		err(1, "fwrite(%s)", argv[3]);
 
 	/* Compute the differences, writing ctrl as we go */
-	if ((pfbz2 = BZ2_bzWriteOpen(&bz2err, pf, 9, 0, 0)) == NULL)
-		errx(1, "BZ2_bzWriteOpen, bz2err = %d", bz2err);
 	scan=0;len=0;
 	lastscan=0;lastpos=0;lastoffset=0;
 	while(scan<newsize) {
@@ -332,28 +327,22 @@ int main(int argc,char *argv[])
 			eblen+=(scan-lenb)-(lastscan+lenf);
 
 			offtout(lenf,buf);
-			BZ2_bzWrite(&bz2err, pfbz2, buf, 8);
-			if (bz2err != BZ_OK)
-				errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
+			if (fwrite(buf, 8, 1, pf) != 1)
+				err(1, "fwrite(%s)", argv[3]);
 
 			offtout((scan-lenb)-(lastscan+lenf),buf);
-			BZ2_bzWrite(&bz2err, pfbz2, buf, 8);
-			if (bz2err != BZ_OK)
-				errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
+			if (fwrite(buf, 8, 1, pf) != 1)
+				err(1, "fwrite(%s)", argv[3]);
 
 			offtout((pos-lenb)-(lastpos+lenf),buf);
-			BZ2_bzWrite(&bz2err, pfbz2, buf, 8);
-			if (bz2err != BZ_OK)
-				errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
+			if (fwrite(buf, 8, 1, pf) != 1)
+				err(1, "fwrite(%s)", argv[3]);
 
 			lastscan=scan-lenb;
 			lastpos=pos-lenb;
 			lastoffset=pos-scan;
 		};
 	};
-	BZ2_bzWriteClose(&bz2err, pfbz2, 0, NULL, NULL);
-	if (bz2err != BZ_OK)
-		errx(1, "BZ2_bzWriteClose, bz2err = %d", bz2err);
 
 	/* Compute size of compressed ctrl data */
 	if ((len = ftello(pf)) == -1)
@@ -361,14 +350,8 @@ int main(int argc,char *argv[])
 	offtout(len-32, header + 8);
 
 	/* Write compressed diff data */
-	if ((pfbz2 = BZ2_bzWriteOpen(&bz2err, pf, 9, 0, 0)) == NULL)
-		errx(1, "BZ2_bzWriteOpen, bz2err = %d", bz2err);
-	BZ2_bzWrite(&bz2err, pfbz2, db, dblen);
-	if (bz2err != BZ_OK)
-		errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
-	BZ2_bzWriteClose(&bz2err, pfbz2, 0, NULL, NULL);
-	if (bz2err != BZ_OK)
-		errx(1, "BZ2_bzWriteClose, bz2err = %d", bz2err);
+	if (fwrite(db, dblen, 1, pf) != 1)
+		err(1, "fwrite(%s)", argv[3]);
 
 	/* Compute size of compressed diff data */
 	if ((newsize = ftello(pf)) == -1)
@@ -376,14 +359,8 @@ int main(int argc,char *argv[])
 	offtout(newsize - len, header + 16);
 
 	/* Write compressed extra data */
-	if ((pfbz2 = BZ2_bzWriteOpen(&bz2err, pf, 9, 0, 0)) == NULL)
-		errx(1, "BZ2_bzWriteOpen, bz2err = %d", bz2err);
-	BZ2_bzWrite(&bz2err, pfbz2, eb, eblen);
-	if (bz2err != BZ_OK)
-		errx(1, "BZ2_bzWrite, bz2err = %d", bz2err);
-	BZ2_bzWriteClose(&bz2err, pfbz2, 0, NULL, NULL);
-	if (bz2err != BZ_OK)
-		errx(1, "BZ2_bzWriteClose, bz2err = %d", bz2err);
+	if (fwrite(eb, eblen, 1, pf) != 1)
+		err(1, "fwrite(%s)", argv[3]);
 
 	/* Seek to the beginning, write the header, and close the file */
 	if (fseeko(pf, 0, SEEK_SET))
