@@ -10,6 +10,10 @@ bspatch:	bspatch.c
 
 install:
 	${INSTALL_PROGRAM} bsdiff bspatch ${PREFIX}/bin
-.ifndef WITHOUT_MAN
+ifndef WITHOUT_MAN
 	${INSTALL_MAN} bsdiff.1 bspatch.1 ${PREFIX}/man/man1
-.endif
+endif
+
+.PHONY: clean
+clean:
+	rm -f bsdiff bspatch
