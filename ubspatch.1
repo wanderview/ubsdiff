@@ -23,41 +23,37 @@
 .\" IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 .\" POSSIBILITY OF SUCH DAMAGE.
 .\"
-.\" $FreeBSD: src/usr.bin/bsdiff/bsdiff/bsdiff.1,v 1.1 2005/08/06 01:59:05 cperciva Exp $
+.\" $FreeBSD: src/usr.bin/bsdiff/bspatch/bspatch.1,v 1.1 2005/08/06 01:59:06 cperciva Exp $
 .\"
 .Dd May 18, 2003
-.Dt BSDIFF 1
+.Dt BSPATCH 1
 .Os FreeBSD
 .Sh NAME
-.Nm bsdiff
-.Nd generate a patch between two binary files
+.Nm ubspatch
+.Nd apply a patch built with ubsdiff(1)
 .Sh SYNOPSIS
 .Nm
 .Ao Ar oldfile Ac Ao Ar newfile Ac Ao Ar patchfile Ac
 .Sh DESCRIPTION
 .Nm
-compares
-.Ao Ar oldfile Ac
-to
+generates
 .Ao Ar newfile Ac
-and writes to
-.Ao Ar patchfile Ac
-a binary patch suitable for use by bspatch(1).
-When
+from
 .Ao Ar oldfile Ac
 and
-.Ao Ar newfile Ac
-are two versions of an executable program, the
-patches produced are on average a factor of five smaller
-than those produced by any other binary patch tool known
-to the author.
+.Ao Ar patchfile Ac
+where
+.Ao Ar patchfile Ac
+is a binary patch built by ubsdiff(1).
 .Pp
 .Nm
-uses memory equal to 17 times the size of 
-.Ao Ar oldfile Ac ,
-and requires
-an absolute minimum working set size of 8 times the size of oldfile.
+uses memory equal to the size of 
+.Ao Ar oldfile Ac
+plus the size of 
+.Ao Ar newfile Ac ,
+but can tolerate a very small working set without a dramatic loss
+of performance.
 .Sh SEE ALSO
-.Xr bspatch 1
+.Xr ubsdiff 1
 .Sh AUTHORS
 .An Colin Percival Aq cperciva@freebsd.org
