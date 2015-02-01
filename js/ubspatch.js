@@ -1,3 +1,11 @@
+// The ubspatch module provides a single function that applies a diff file
+// generated with the ubsdiff command line tool.  The function signature is:
+//
+//  function(oldBuffer, patchBuffer)
+//
+// Where both oldBuffer and patchBuffer are ArrayBuffer objects.  The oldBuffer
+// should contain the contents of the original file.  The patchBuffer should
+// contain the contents of the ubsdiff-generated diff file.
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     define([], factory);
@@ -10,8 +18,8 @@
 
 // Offsets are 64-bit little endian signed ints.  We support positive and
 // negative values that can be expressed in 32-bits.  Otherwise we throw.
-// This seems reasonable given that its unlikely the browser will processing
-// files greater than 2GB.
+// This seems reasonable given that its unlikely the browser will need to
+// process files greater than 2GB.
 function offtin(dataView, offset) {
   var high = dataView.getInt32(offset + 4, true /* litteEndian */);
   // Only non-zero value we allow for high bytes are sign extension from
@@ -129,6 +137,6 @@ return function (oldBuffer, patchBuffer) {
   }
 
   return newBuffer;
-}
+};
 
 }));
