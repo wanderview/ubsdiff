@@ -350,8 +350,9 @@ int main(int argc,char *argv[])
 	offtout(len-32, header + 8);
 
 	/* Write compressed diff data */
-	if (fwrite(db, dblen, 1, pf) != 1)
-		err(1, "fwrite(%s)", argv[3]);
+	if (dblen > 0)
+		if (fwrite(db, dblen, 1, pf) != 1)
+			err(1, "fwrite(%s)", argv[3]);
 
 	/* Compute size of compressed diff data */
 	if ((newsize = ftello(pf)) == -1)
@@ -359,8 +360,9 @@ int main(int argc,char *argv[])
 	offtout(newsize - len, header + 16);
 
 	/* Write compressed extra data */
-	if (fwrite(eb, eblen, 1, pf) != 1)
-		err(1, "fwrite(%s)", argv[3]);
+	if (eblen > 0)
+		if (fwrite(eb, eblen, 1, pf) != 1)
+			err(1, "fwrite(%s)", argv[3]);
 
 	/* Seek to the beginning, write the header, and close the file */
 	if (fseeko(pf, 0, SEEK_SET))
