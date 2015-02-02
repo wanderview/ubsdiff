@@ -1,0 +1,25 @@
+{
+  "name": "ubspatch",
+  "description": "Apply ubsdiff patch files",
+  "keywords": [
+    "diff",
+    "patch",
+    "ubsdiff"
+  ],
+  "version": "1.0.0",
+  "author": "Ben Kelly <ben@wanderview.com>",
+  "license": "BSD",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "nodeunit": "~0.7.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:wanderview/ubsdiff.git"
+  },
+  "scripts": {
+    "test": "nodeunit test"
+  },
+  "main": "ubspatch.js"
+}
