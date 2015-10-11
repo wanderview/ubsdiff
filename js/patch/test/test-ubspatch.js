@@ -64,7 +64,7 @@ function loadFiles(subdir, cb) {
 }
 
 function testFiles(test, subdir) {
-  loadFiles('simple', function(err, origBuf, patchBuf, expBuf) {
+  loadFiles(subdir, function(err, origBuf, patchBuf, expBuf) {
     if (err) { return test.done(err); }
     try {
       var result = ubspatch(origBuf, patchBuf);
@@ -103,10 +103,14 @@ module.exports.suffix = function(test) {
   testFiles(test, 'suffix');
 };
 
-module.exports.suffix = function(test) {
+module.exports.case = function(test) {
   testFiles(test, 'case');
 };
 
-module.exports.simple = function(test) {
+module.exports.mixed = function(test) {
   testFiles(test, 'mixed');
+};
+
+module.exports.jquery = function(test) {
+  testFiles(test, 'jquery');
 };

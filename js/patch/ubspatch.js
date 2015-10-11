@@ -26,10 +26,11 @@ function offtin(dataView, offset) {
   var high = dataView.getInt32(offset + 4, true /* litteEndian */);
   // Only non-zero value we allow for high bytes are sign extension from
   // the lower 32-bits.
-  if (high !== 0 && high !== -1) {
+  var sign = high === -0x80000000 ? -1 : 1;
+  if (high !== 0 && high !== -0x80000000) {
     throw new Error('offset exceeds 32-bit limit');
   }
-  return dataView.getInt32(offset, true /* litteEndian */);
+  return sign * dataView.getInt32(offset, true /* litteEndian */);
 }
 
 function parseHeader(dataView) {
@@ -123,16 +124,18 @@ return function (oldBuffer, patchBuffer) {
     newpos += ctrl[0];
     oldpos += ctrl[0];
 
-    if (newpos + ctrl[1] > header.newsize) {
-      throw new Error('Corrupt patch');
+    if (ctrl[1]) {
+      if (newpos + ctrl[1] > header.newsize) {
+        throw new Error('Corrupt patch');
+      }
+
+      // Bulk copy bytes form the extra section
+      var extraToCopy = extraArray.subarray(extrapos. extrapos + ctrl[1]);
+      newArray.set(extraToCopy, newpos);
+      extrapos += ctrl[1];
+
+      newpos += ctrl[1];
     }
-
-    // Bulk copy bytes form the extra section
-    var extraToCopy = extraArray.subarray(extrapos. extrapos + ctrl[1]);
-    newArray.set(extraToCopy, newpos);
-    extrapos += ctrl[1];
-
-    newpos += ctrl[1];
 
     // Skip bytes in the old buffer
     oldpos += ctrl[2];
