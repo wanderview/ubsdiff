@@ -12,7 +12,7 @@
   } else if (typeof exports === 'object') {
     module.exports = factory();
   } else {
-    root.returnExports = factory();
+    root.ubspatch = factory();
   }
 }(this, function() {
 
